@@ -15,3 +15,6 @@ CLI:
 cd "C:\your\download\location\MalScan"
 python main.py
 ```
+MalwareBazaar:
+- To get a MalwareBazaar API key (needed for the program to check the file hash against MalwareBazaar database) you must go to their website, create an account and generate an Auth key.
+- When you run this program you just paste your API key into the prompt that appears in the terminal
