@@ -14,5 +14,5 @@ You can use CLI or run it through a code editor with a terminal
 CLI:
 ```powershell
 cd "C:\your\download\location\MalScan"
-pythong main.py
+python main.py
 ```
