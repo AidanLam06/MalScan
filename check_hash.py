@@ -18,7 +18,6 @@ def compare_hash(file_path):
     response = requests.post(url, data = data, headers = headers)
     
     if response.ok:
-        print("\n\n************REQUEST SUCCESSFUL************")
         result = response.json()
         signature = result.get("data")
         if signature != None:
@@ -37,5 +36,4 @@ def compare_hash(file_path):
             print("--> Hash clear")
 
     else:
-        print("\n\n************REQUEST FAILED************")
         print(f"Error: {response.status_code} - {response.text}")

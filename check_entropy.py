@@ -9,6 +9,9 @@ def find_entropy(file_path):
     except PermissionError:
         print("The file path must lead to a file. Perhaps you've specified the location to a folder or a file that requires admin permissions to access?")
         sys.exit(0)
+    except FileNotFoundError:
+        print("File not found")
+        sys.exit(0)
 
     occurrence = Counter(data)
     file_len = len(data)
