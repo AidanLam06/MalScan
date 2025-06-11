@@ -1,28 +1,28 @@
 import yara
 import os
+from constants import YARA_DIR
 
-ruledir = "yara"
+rules = os.listdir(YARA_DIR)
 
 def ruleset_match(filepath):
     ruleset = {}
-    for i, filename in enumerate(os.listdir(ruledir)):
+    for i, filename in enumerate(os.listdir(YARA_DIR)):
         if filename.endswith(".yar"):
-            ruleset[filename[:-4]] = os.path.join(ruledir, filename)
+            ruleset[filename[:-4]] = os.path.join(YARA_DIR, filename)
 
     rules = yara.compile(filepaths=ruleset)
     matches = rules.match(filepath)
 
     if len(matches) == 0:
+        print("--> YARA clear")
         return False, None 
     else: 
         print("Hits:")
         for i, match in enumerate(matches):
             print(f"{i}) {match}")
+        
+        print("--> YARA hit")
         return True, matches
-
-def get_ruleset():
-    ruleset = [i for i in (os.listdir(ruledir)) if i.endswith(".yar")]
-    return ruleset
 
 def match_diagnosis(matches):
     for i in matches:
