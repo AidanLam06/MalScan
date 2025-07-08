@@ -9,6 +9,9 @@ def find_entropy(file_path):
     except PermissionError:
         print("The file path must lead to a file. Perhaps you've specified the location to a folder or a file that requires admin permissions to access?")
         sys.exit(0)
+    except FileNotFoundError:
+        print("File not found")
+        sys.exit(0)
 
     occurrence = Counter(data)
     file_len = len(data)
@@ -18,8 +21,8 @@ def find_entropy(file_path):
         entropy += -(p*math.log2(p)) # Shannon Entropy of each individual byte added to a sum entropy 
     en = round(entropy, 2)
     if en >7.4:
-        # print("--> Entropy hit")
+        print("--> Entropy hit")
         return True
     else:
-        # print("--> Entropy clear")
+        print("--> Entropy clear")
         return False

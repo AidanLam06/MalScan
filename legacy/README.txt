@@ -1,0 +1,1 @@
+This version allows you to scan a single file and has input prompts through python rather than command line arguments. Run through main.py file
