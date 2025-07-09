@@ -21,16 +21,19 @@ if (-not (Test-Path -Path $FolderPath)) {
     exit 1
 }
 
-$items = Get-ChildItem -Path $FolderPath -Recurse
+$items = Get-ChildItem -Path $FolderPath -Recurse -File
 
 $batchSize = 50
 $processed = 0
 
 $detected = @{}
 $unhandled = [System.Collections.ArrayList]@()
+#remove before push
+$count = 0
 
 foreach ($batch in $items | Select-Object -Skip $processed -First $batchSize | Select-Object -ExpandProperty FullName) {
     $batch | ForEach-Object {
+        Write-Host $_
         try {
             $string = python main.py --file $_ --apikey $ApiKey 2>&1
             $result = ($string -split "-", 2)[0].Trim()
@@ -43,36 +46,42 @@ foreach ($batch in $items | Select-Object -Skip $processed -First $batchSize | S
             else {
                 Write-Host "[$result]" -ForegroundColor $color  
                 if ($color -ne "Green") {
-                    detected[$_] = $string
+                    $detected[$_] = $string
                 }
             }
             $processed++
         }
         catch {
+            Write-Host -NoNewline $count
             Write-Host "[FATAL ERROR] $_" -ForegroundColor Red
             [void]$unhandled.Add($_)
+            $count++
         }
     }
 }
 
 $maxPathLength = ($detected.Keys | Measure-Object -Property Length -Maximum).Maximum
 
-Write-Host "********LIST OF DETECTED FILES********"
-Write-Host ("{0} : {1}" -f "File Path".PadRight($maxPathLength), "Risk")
-Write-Host("{0} : {1}" -f "---------".PadRight($maxPathLength), "----")
+if ($detected.Length -gt 0) {
+    Write-Host "`n********LIST OF DETECTED FILES********"
+    Write-Host ("{0} : {1}" -f "File Path".PadRight($maxPathLength), "Risk")
+    Write-Host("{0} : {1}" -f "---------".PadRight($maxPathLength), "----")
 
-foreach ($entry in $detected.GetEnumerator()) {
-    $riskPieces = $entry.Value -split "-"
-    $risk = riskPieces[0]
-    $color = $riskPieces[1]
+    foreach ($entry in $detected.GetEnumerator()) {
+        $riskPieces = $entry.Value -split "-"
+        $risk = $riskPieces[0]
+        $color = $riskPieces[1]
 
-    $paddedPath = $entry.Key.PadRight($maxPathLength)
+        $paddedPath = $entry.Key.PadRight($maxPathLength)
 
-    Write-Host -NoNewline $paddedPath
-    Write-Host -NoNewline " : "
-    Write-Host $risk -ForegroundColor $color
+        Write-Host -NoNewline $paddedPath
+        Write-Host -NoNewline " : "
+        Write-Host $risk -ForegroundColor $color
+    }
 }
-
-Write-Host "********LIST OF UNHANDLED FILES********"
-$unhandled | ForEach-Object {Write-Host $_}
-Write-Host "`nScan complete. Processed $processed files." -ForegroundColor Cyan
+    
+if ($unhandled.Length -gt 0) {
+    Write-Host "`n********LIST OF UNHANDLED FILES********"
+    $unhandled | ForEach-Object {Write-Host $_}
+    Write-Host "`nScan complete. Processed $processed files." -ForegroundColor Cyan
+}

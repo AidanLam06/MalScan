@@ -19,7 +19,7 @@ def main():
     if match_bool:
         print("HIGH RISK-Orange")
     elif entropy and not match_bool: #elif entropy and not hash_match and not match_bool:
-        print("MEDIUM RISK-Yellow")
+        print("LOW RISK-Yellow")
     else:
         print("Clear-Green")
 
